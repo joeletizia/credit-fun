@@ -1,5 +1,6 @@
 require 'active_record'
 require 'gibberish'
+require 'validates_timeliness'
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
@@ -23,6 +24,8 @@ class CreditCard < ActiveRecord::Base
   validate :cc_num_format
   validate :card_type_accepted
   validate :csv_format
+  validates_date :expiration
+
 
   def initialize
     k = Gibberish::RSA.generate_keypair(1024)
