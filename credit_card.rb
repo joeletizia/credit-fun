@@ -17,8 +17,6 @@ ActiveRecord::Schema.define do
     end
 end
 
-
-
 class CreditCard < ActiveRecord::Base
   attr_accessor :cc_num, :csv, :expiration, :card_type, :private_key, :public_key
 
@@ -39,16 +37,27 @@ class CreditCard < ActiveRecord::Base
 
   def self.decrypt(hash, key)
     cipher = Gibberish::RSA.new(key)
-    cipher.decrypt(hash)
+    CreditCard.from_hash(cipher.decrypt(hash))
   end
 
   def to_s
     "#{self.cc_num} #{self.csv} #{self.expiration.strftime "%m"}-#{self.expiration.strftime "%y"} #{self.card_type}"
   end
 
+  def self.from_hash(hash)
+    vals = hash.split " "
 
-  private 
+    new_card = CreditCard.new
 
+    new_card.cc_num = vals[0]
+    new_card.csv = vals[1]
+    new_card.expiration = Date.strptime "#{vals[2]}", "%m-%y"
+    new_card.card_type = vals[3]
+
+    new_card      
+  end 
+
+  private
     def csv_format
       errors.add(:csv, 'CSV length must be 3 or 4') unless [3,4].include? self.csv.length 
       errors.add(:csv, 'CSV must be numeric') if self.csv.to_i == 0
