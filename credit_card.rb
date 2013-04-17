@@ -44,7 +44,8 @@ class CreditCard < ActiveRecord::Base
   end
 
   def to_s
-    "#{self.cc_num} #{self.csv} #{self.expiration.strftime "%m"}-#{self.expiration.strftime "%y"} #{self.card_type}"
+    nonce = (0...8).map{(65+rand(26)).chr}.join
+    "#{self.cc_num} #{self.csv} #{nonce} #{self.expiration.strftime "%m"}-#{self.expiration.strftime "%y"} #{self.card_type}"
   end
 
   def self.from_hash(hash)
@@ -54,8 +55,8 @@ class CreditCard < ActiveRecord::Base
 
     new_card.cc_num = vals[0]
     new_card.csv = vals[1]
-    new_card.expiration = Date.strptime "#{vals[2]}", "%m-%y"
-    new_card.card_type = vals[3]
+    new_card.expiration = Date.strptime "#{vals[3]}", "%m-%y"
+    new_card.card_type = vals[4]
 
     new_card      
   end 
