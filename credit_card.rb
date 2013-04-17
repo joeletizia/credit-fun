@@ -1,4 +1,5 @@
 require 'active_record'
+require 'gibberish'
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
@@ -11,17 +12,39 @@ ActiveRecord::Schema.define do
       table.column :csv, :string
       table.column :expiration, :date 
       table.column :card_type, :string
+      table.column :private_key, :string
+      table.column :public_key, :string
     end
 end
 
 
 
 class CreditCard < ActiveRecord::Base
-  attr_accessor :cc_num, :csv, :expiration, :card_type
+  attr_accessor :cc_num, :csv, :expiration, :card_type, :private_key, :public_key
 
-  validates :cc_num_format
-  validates :card_type_accepted
-  validates :csv_format
+  validate :cc_num_format
+  validate :card_type_accepted
+  validate :csv_format
+
+  def initialize
+    k = Gibberish::RSA.generate_keypair(1024)
+    self.public_key = k.public_key
+    self.private_key = k.private_key
+  end
+
+  def encrypt
+    cipher = Gibberish::RSA.new(self.public_key)
+    cipher.encrypt(self.to_s)
+  end
+
+  def self.decrypt(hash, key)
+    cipher = Gibberish::RSA.new(key)
+    cipher.decrypt(hash)
+  end
+
+  def to_s
+    "#{self.cc_num} #{self.csv} #{self.expiration.strftime "%m"}-#{self.expiration.strftime "%y"} #{self.card_type}"
+  end
 
 
   private 
