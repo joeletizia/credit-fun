@@ -14,7 +14,7 @@ x.card_type = 'visa'
 
 ret = CreditCard.decrypt(x.encrypt, x.private_key)
 
-puts "Ret is #{ret}"
+puts "Decrypted: #{ret}"
 
 puts (x.cc_num === ret.cc_num ? 'It worked' : "failed, got #{ret}")
 
@@ -27,6 +27,6 @@ x.card_type = 'mastercard'
 
 ret = CreditCard.decrypt(x.encrypt, x.private_key)
 
-puts "Ret is #{ret}"
+puts "Decrypted: #{ret}"
 
 puts (x.cc_num === ret.cc_num ? 'It worked' : "failed, got #{ret}")
