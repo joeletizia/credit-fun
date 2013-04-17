@@ -66,7 +66,7 @@ class CreditCard < ActiveRecord::Base
       errors.add(:csv, 'CSV must be numeric') if self.csv.to_i == 0
     end
     def card_type_accepted
-      errors.add(:card_type, 'We only accept visa and amex') unless ['visa','amex'].include? self.card_type
+      errors.add(:card_type, 'We only accept visa and amex') unless ['visa','mastercard','amex'].include? self.card_type
     end
 
     def cc_num_format
