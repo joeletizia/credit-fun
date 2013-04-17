@@ -21,25 +21,21 @@ class CreditCard < ActiveRecord::Base
 
   validates :cc_num_format
   validates :card_type_accepted
+  validates :csv_format
 
 
   private 
 
+    def csv_format
+      errors.add(:csv, 'CSV length must be 3 or 4') unless [3,4].include? self.csv.length 
+      errors.add(:csv, 'CSV must be numeric') if self.csv.to_i == 0
+    end
     def card_type_accepted
-      errors.add(:card_type, 'We only accept visa and amex') unless ['visa','amex'].include? :card_type
+      errors.add(:card_type, 'We only accept visa and amex') unless ['visa','amex'].include? self.card_type
     end
 
     def cc_num_format
-      if self.cc_num.length != 16
-        errors.add(:cc_num, 'Invalid number of characters.')
-      end
-
-      self.cc_num.split("").each do |char|
-        unless char =~ /[[:digit:]]/
-          errors.add(:cc_num, 'Credit Card number should not contain non-numerics')
-          break  
-        end
-      end
-      
+      errors.add(:cc_num, 'Invalid number of characters.') if self.cc_num.length != 16
+      errors.add(:cc_num, 'Credit Card number should not contain non-numerics') if self.cc_num.to_i == 0
     end
 end
